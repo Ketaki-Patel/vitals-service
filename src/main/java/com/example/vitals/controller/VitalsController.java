@@ -14,20 +14,11 @@ public class VitalsController {
 
     private final VitalsService vitalsService;
 
-//    public VitalsController(VitalsService vitalsService) {
-//        this.vitalsService = vitalsService;
-//    }
-
     @PostMapping
     public Mono<ResponseEntity<Void>> receiveReading(@RequestBody Reading reading) {
         return vitalsService.handleReading(reading)
                 .thenReturn(ResponseEntity.accepted().<Void>build())
                 .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().<Void>build()));
     }
-
-//    @GetMapping
-//    public Flux<VitalReading> getAllReadings() {
-//        return   vitalsService.getAllReadings();
-//    }
 
 }

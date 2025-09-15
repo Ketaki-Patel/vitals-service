@@ -71,26 +71,6 @@
             <version>2.1.0</version>
         </dependency>
 
-<!--        &lt;!&ndash; Spring Data R2DBC &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-data-r2dbc</artifactId>-->
-<!--        </dependency>-->
-
-<!--        &lt;!&ndash; H2 R2DBC driver &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>io.r2dbc</groupId>-->
-<!--            <artifactId>r2dbc-h2</artifactId>-->
-<!--            <version>1.0.0.RELEASE</version>-->
-<!--        </dependency>-->
-
-<!--        &lt;!&ndash; H2 Console (optional, for UI access) &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.h2database</groupId>-->
-<!--            <artifactId>h2</artifactId>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
