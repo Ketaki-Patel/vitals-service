@@ -7,6 +7,7 @@
 -  Valid readings are forwarded to Alerts Service (http://localhost:8082/evaluate)
 -  No authentication or error mapping is implemented yet — kept simple for demo.
 -  Patient Vitals are stored in ** H2 Database ** along with Concurrent Hash
+-  For more info visit https://github.com/Ketaki-Patel/vitals-service/blob/main/README.md
 
 
 ### 2. Swagger UI (added swagger api for convenience)
