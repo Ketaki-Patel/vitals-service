@@ -40,7 +40,6 @@ public class VitalsController {
     public Mono<ResponseEntity<Reading>> getReadingById(@PathVariable @NonNull UUID readingId) {
         return vitalsService.getReadingById(readingId)
                 .map(ResponseEntity::ok);
-                //.defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     // Get readings by patient ID

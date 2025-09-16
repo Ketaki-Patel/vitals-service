@@ -25,7 +25,6 @@ public class GlobalErrorController  {
                 .status(HttpStatus.NOT_FOUND.value())
                 .error("Not Found")
                 .message(ex.getMessage())
-                // .path("/readings") // Optional: dynamically add request path if needed
                 .build();
 
         return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(error));
@@ -40,7 +39,6 @@ public class GlobalErrorController  {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Bad Request")
                 .message(ex.getMessage())
-              //  .path("/readings")
                 .build();
 
         return Mono.just(ResponseEntity.badRequest().body(error));

@@ -52,8 +52,6 @@ public class Reading {
 
     @Schema(description = "ISO 8601 timestamp when the reading was captured", example = "2025-08-01T12:00:00Z")
     private Instant capturedAt;
-
-    // getters and setters
 }
 
 

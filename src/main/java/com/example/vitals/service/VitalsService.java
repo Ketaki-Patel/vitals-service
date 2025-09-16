@@ -28,23 +28,18 @@ public class VitalsService {
     private final ReadingEntityInsertHelper readingEntityInsertHelper;
 
     /**
-     * take home project description talks about only using concurrentHash but I also
-     * persisting data in inMemory h2 database with some config change you can persist h2 data
-     * in file system. I am not persisting in file to keep it simple
-     * just showing two types of in memory persistence
+     *  take home project description talks about only using concurrentHash, but I also
+     *  persist data in inMemory h2 database
+     *  with some small config change we can persist h2 data in file system. I am not persisting in file
+     *  to keep it simple just showcasing two types of in memory persistence here.
      * @param reading
      * @return
      */
     public Mono<Void> handleReading(Reading reading) {
         log.info("Reading before validation: {}", reading);
 
-//        if (reading.getReadingId() == null || reading.getPatientId() == null || reading.getType() == null) {
-//            return Mono.error(new IllegalArgumentException("Missing required fields"));
-//        }
-
         if (!validateFieldsByType(reading)) {
             log.info("Missing or mismatched type, Allowable types are only [BP, HR, SPO2]");
-           // return Mono.error(new IllegalArgumentException("Missing type specific fields"));
             throw new IllegalArgumentException("Missing or mismatched type, Allowable types are only [BP, HR, SPO2]");
         }
 
@@ -56,9 +51,16 @@ public class VitalsService {
 
         log.info("Reading passed in-memory idempotency check: {}", reading);
 
+        return checkAndInsertReadingInDB(reading)
+                .then(sendReadingToAlerts(reading));
 
+    }
+
+
+    private Mono<Void> checkAndInsertReadingInDB(Reading reading) {
         return readingRepository.existsByReadingId(reading.getReadingId())
                 .flatMap(exists -> {
+
                     //DB-level idempotency check (redundant in our case as we already checked readingStore(concurrentHash)
                     if (exists) {
                         log.info("Reading with ID {} already exists in DB, skipping insert", reading.getReadingId());
@@ -69,21 +71,30 @@ public class VitalsService {
                     log.info("Mapped ReadingEntity: {}", entity);
 
                     // Use R2dbcEntityTemplate to insert
-                    return readingEntityInsertHelper.insertReading(entity) // pass the entity
-                            .doOnSuccess(v -> log.info("Successfully inserted reading into DB"))
-                            .onErrorResume(ex -> {
-                                log.error("DB insert failed: {}", ex.getMessage(), ex);
-                                return Mono.error(new RuntimeException("Database write failed"));
-                            })
-                            .then(alertsClient.sendToAlerts(reading)) // async call after successful save
-                            .doOnSuccess(v -> log.info("Sent reading to alerts service"))
-                            .onErrorResume(ex -> {
-                                // Maybe notify another system, log more, or just continue
-                                log.warn("Continuing despite alert service failure: {}", ex.toString());
-                                return Mono.empty(); // Ignore the failure and move on
+                    // readingRepository.save(entity) was not behaving as expected so I made choice to use R2dbcEntityTemplate
+                    return readingEntityInsertHelper.insertReading(entity)
+                            .doOnSuccess(v -> log.info("✅ Successfully inserted reading into DB"))
+                            .onErrorMap(ex -> {
+                                log.error("❌ DB insert failed: {}", ex.getMessage(), ex);
+                                return new RuntimeException("DB failed", ex);
                             });
-
                 });
+    }
+
+    /**
+     * if alert fails ,code will just log and resume i.e original api call will not throw error
+     * @param reading
+     * @return
+     */
+    private Mono<Void> sendReadingToAlerts(Reading reading) {
+        return alertsClient.sendToAlerts(reading)
+                .doOnSuccess(v -> log.info("📨 Sent reading to alerts service"))
+                .onErrorResume(ex -> {
+                    // Log error or handle retry logic
+                    log.warn("Failed to send alert: {}", ex.toString());
+                    return Mono.empty();
+    });
+
     }
 
     private boolean validateFieldsByType(Reading reading) {
@@ -95,8 +106,9 @@ public class VitalsService {
         };
     }
 
-    //following methods are extra methods for checking values persisted in the h2 database.
+
     // Additional methods for querying data
+    //following methods are extra methods which retrieves data from the h2 database.
     public Flux<Reading> getReadingsByPatientId(String patientId) {
         return readingRepository.findByPatientId(patientId)
                 .map(readingMapper::toDto);
@@ -108,8 +120,6 @@ public class VitalsService {
     }
 
     public Mono<Reading> getReadingById(UUID readingId) {
-//        return readingRepository.findById(readingId)
-//                .map(readingMapper::toDto);
         return readingRepository.findById(readingId)
                 .map(readingMapper::toDto)
                 .switchIfEmpty(Mono.error(new ReadingNotFoundException("Reading not found with ID: " + readingId)));
@@ -119,9 +129,5 @@ public class VitalsService {
         return readingRepository.findAll()
                 .map(readingMapper::toDto);
     }
-
-
-
-
 
 }

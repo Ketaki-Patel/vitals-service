@@ -1,10 +1,12 @@
 package com.example.vitals.dto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Component
+@Slf4j
 public class AlertsClient {
 
     private final WebClient webClient;
@@ -19,12 +21,21 @@ public class AlertsClient {
         return webClient.post()
                 .uri("/evaluate")
                 .bodyValue(reading)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .onErrorResume(ex -> {
-                    // Log error or handle retry logic
-                    ex.printStackTrace();
-                    return Mono.empty();
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is2xxSuccessful()) {
+                        return Mono.empty();
+                    } else {
+                        return response.bodyToMono(String.class)
+                                .defaultIfEmpty("No error body")
+                                .flatMap(errorBody -> {
+                                    String errorMsg = String.format("Alert service error (%s): %s",
+                                            response.statusCode(), errorBody);
+                                    log.warn("{}", errorMsg);
+                                    return Mono.error(new RuntimeException(errorMsg));
+                                });
+                    }
                 });
     }
+
+
 }

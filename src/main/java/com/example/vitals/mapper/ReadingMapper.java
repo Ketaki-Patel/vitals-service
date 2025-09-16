@@ -4,7 +4,7 @@ import com.example.vitals.entity.ReadingEntity;
 import org.springframework.stereotype.Component;
 
 /**
- * we can us mapstruct but keeping it simple for this project
+ * we can us MapStruct library but keeping it simple for this project
  */
 @Component
 public class ReadingMapper {
