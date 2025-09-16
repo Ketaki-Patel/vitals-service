@@ -2,9 +2,15 @@ package com.example.vitals.service;
 
 import com.example.vitals.dto.AlertsClient;
 import com.example.vitals.dto.Reading;
+import com.example.vitals.entity.ReadingEntity;
+import com.example.vitals.exception.ReadingNotFoundException;
+import com.example.vitals.mapper.ReadingMapper;
+import com.example.vitals.repository.ReadingEntityInsertHelper;
+import com.example.vitals.repository.ReadingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -17,29 +23,67 @@ public class VitalsService {
 
     private final ConcurrentHashMap<UUID, Reading> readingStore = new ConcurrentHashMap<>();
     private final AlertsClient alertsClient;
+    private final ReadingRepository readingRepository;
+    private final ReadingMapper readingMapper;
+    private final ReadingEntityInsertHelper readingEntityInsertHelper;
 
+    /**
+     * take home project description talks about only using concurrentHash but I also
+     * persisting data in inMemory h2 database with some config change you can persist h2 data
+     * in file system. I am not persisting in file to keep it simple
+     * just showing two types of in memory persistence
+     * @param reading
+     * @return
+     */
     public Mono<Void> handleReading(Reading reading) {
-        log.info("reading before validation:  " + reading);
-        if (reading.getReadingId() == null || reading.getPatientId() == null || reading.getType() == null) {
-            return Mono.error(new IllegalArgumentException("Missing required fields"));
-        }
+        log.info("Reading before validation: {}", reading);
+
+//        if (reading.getReadingId() == null || reading.getPatientId() == null || reading.getType() == null) {
+//            return Mono.error(new IllegalArgumentException("Missing required fields"));
+//        }
 
         if (!validateFieldsByType(reading)) {
-            return Mono.error(new IllegalArgumentException("Missing type-specific fields"));
+            log.info("Missing or mismatched type, Allowable types are only [BP, HR, SPO2]");
+           // return Mono.error(new IllegalArgumentException("Missing type specific fields"));
+            throw new IllegalArgumentException("Missing or mismatched type, Allowable types are only [BP, HR, SPO2]");
         }
 
-        // Idempotency check
+        // In-memory idempotency check
         if (readingStore.putIfAbsent(reading.getReadingId(), reading) != null) {
-            return Mono.empty(); // Already exists
+            log.info("Duplicate reading detected. Already handled for readingID {}", reading.getReadingId());
+            return Mono.empty(); // Already handled
         }
 
-        log.info("reading:  " + reading);
+        log.info("Reading passed in-memory idempotency check: {}", reading);
 
-//       // return Mono.empty();
-//
-//        // Async forward to alerts service
-       return alertsClient.sendToAlerts(reading).then();
 
+        return readingRepository.existsByReadingId(reading.getReadingId())
+                .flatMap(exists -> {
+                    //DB-level idempotency check (redundant in our case as we already checked readingStore(concurrentHash)
+                    if (exists) {
+                        log.info("Reading with ID {} already exists in DB, skipping insert", reading.getReadingId());
+                        return Mono.empty();
+                    }
+
+                    ReadingEntity entity = readingMapper.toEntity(reading);
+                    log.info("Mapped ReadingEntity: {}", entity);
+
+                    // Use R2dbcEntityTemplate to insert
+                    return readingEntityInsertHelper.insertReading(entity) // pass the entity
+                            .doOnSuccess(v -> log.info("Successfully inserted reading into DB"))
+                            .onErrorResume(ex -> {
+                                log.error("DB insert failed: {}", ex.getMessage(), ex);
+                                return Mono.error(new RuntimeException("Database write failed"));
+                            })
+                            .then(alertsClient.sendToAlerts(reading)) // async call after successful save
+                            .doOnSuccess(v -> log.info("Sent reading to alerts service"))
+                            .onErrorResume(ex -> {
+                                // Maybe notify another system, log more, or just continue
+                                log.warn("Continuing despite alert service failure: {}", ex.toString());
+                                return Mono.empty(); // Ignore the failure and move on
+                            });
+
+                });
     }
 
     private boolean validateFieldsByType(Reading reading) {
@@ -50,6 +94,34 @@ public class VitalsService {
             default -> false;
         };
     }
+
+    //following methods are extra methods for checking values persisted in the h2 database.
+    // Additional methods for querying data
+    public Flux<Reading> getReadingsByPatientId(String patientId) {
+        return readingRepository.findByPatientId(patientId)
+                .map(readingMapper::toDto);
+    }
+
+    public Flux<Reading> getReadingsByType(String type) {
+        return readingRepository.findByType(type)
+                .map(readingMapper::toDto);
+    }
+
+    public Mono<Reading> getReadingById(UUID readingId) {
+//        return readingRepository.findById(readingId)
+//                .map(readingMapper::toDto);
+        return readingRepository.findById(readingId)
+                .map(readingMapper::toDto)
+                .switchIfEmpty(Mono.error(new ReadingNotFoundException("Reading not found with ID: " + readingId)));
+    }
+
+    public Flux<Reading> getAllReadings() {
+        return readingRepository.findAll()
+                .map(readingMapper::toDto);
+    }
+
+
+
 
 
 }

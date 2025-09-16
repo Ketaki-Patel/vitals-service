@@ -1,9 +1,12 @@
 package com.example.vitals.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.time.Instant;
 import java.util.UUID;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 
 @Data
 @NoArgsConstructor
@@ -20,14 +23,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
         - If type = **SPO2**, then `spo2` is required.
         """
 )
+
 public class Reading {
 
+    @NotNull(message = "Reading ID must not be null")
     @Schema(description = "Unique identifier for the reading", example = "11111111-1111-1111-1111-111111111111")
     private UUID readingId;
 
+    @NotBlank(message = "patient ID is required")
     @Schema(description = "ID of the patient", example = "p-001")
     private String patientId;
 
+    @NotBlank(message = "type is required")
     @Schema(description = "Type of reading (BP, HR, SPO2)", example = "BP", allowableValues = {"BP", "HR", "SPO2"})
     private String type;
 

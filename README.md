@@ -1,7 +1,8 @@
 # vitals-service
+This project uses Project Reactor for reactive, asynchronous, and non-blocking processing.
 Receives a patient vital reading, stores it in memory, and sends it asynchronously to the Alerts Service. 
 
-# Vitals → Alerts (Reactive) — Take-Home Assignment
+# Vitals → Alerts (Reactive) 
 
 ## Overview
 Two reactive Spring Boot **3.5.4** microservices (Java **21**) using **Spring WebFlux** and **Project Reactor**:
@@ -9,7 +10,6 @@ Two reactive Spring Boot **3.5.4** microservices (Java **21**) using **Spring We
 1. **Vitals Service** — Accepts patient vital readings, stores them in memory, and forwards them asynchronously to Alerts Service.
 2. **Alerts Service** — Evaluates readings against threshold rules and stores generated alerts in memory.
 
-Target duration: **1–2 hours**.
 
 ## Tech Requirements
 - Java 21
