@@ -35,10 +35,10 @@
 - Provided support for Jakarta Bean Validation (e.g., @Valid, @NotNull) using Hibernate Validator 
   through dependency spring-boot-starter-validation
 
-Validation for required fields like patientId, readingId an types
+- Validation for required fields like patientId, readingId an types
 ![img_2.png](img_2.png)
 
-Validation for mismatched field for type (only allowed BP,HR &bSPO2)
+- Validation for mismatched field for type (only allowed BP,HR &bSPO2)
 ![img_3.png](img_3.png)
 
 
