@@ -34,13 +34,12 @@
 - Used @RestControllerAdvice(@see GlobalErrorController.java in vital-service project)
 - Provided support for Jakarta Bean Validation (e.g., @Valid, @NotNull) using Hibernate Validator 
   through dependency spring-boot-starter-validation
+- Following two images shows
+- 1. Validation for required fields like patientId, readingId an types
+- 2. Validation for mismatched field for type (only allowed BP,HR &bSPO2)
 
-- Validation for required fields like patientId, readingId an types
 ![img_2.png](img_2.png)
-
-- Validation for mismatched field for type (only allowed BP,HR &bSPO2)
 ![img_3.png](img_3.png)
-
 
 ## Supported In Memory Database H2 (for vital-service) along with ConcurrentHashMap 
 patients vitals are persisted concurrent Hash as well as persisted in table called readings(@see schema.sql)
