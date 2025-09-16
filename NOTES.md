@@ -5,7 +5,7 @@
   SPO2 requires spo2
 -  Duplicate readings are ignored (based on readingId)
 -  Valid readings are forwarded to Alerts Service (http://localhost:8082/evaluate)
--  No authentication or error mapping is implemented yet — kept simple for demo.
+-  No authentication is implemented yet — kept simple for demo.
 -  Patient Vitals are stored in ** H2 Database ** along with Concurrent Hash
 -  For more info visit https://github.com/Ketaki-Patel/vitals-service/blob/main/README.md
 
