@@ -7,12 +7,15 @@
 -  Valid readings are forwarded to Alerts Service (http://localhost:8082/evaluate)
 -  No authentication or error mapping is implemented yet — kept simple for demo.
 
-###  Swagger UI (I added swagger api for convenience)
-http://localhost:8081/swagger-ui/index.html (vital-service)
-http://localhost:8082/swagger-ui/index.html (alert-service)
 
-### Alerts Generated using sample data from /resources/mockdata.json
+###  Swagger UI (I added swagger api for convenience)
+- http://localhost:8081/swagger-ui/index.html (vital-service)
+- http://localhost:8082/swagger-ui/index.html (alert-service)
+
+
+###  Alerts Generated using sample data from src/main/resources/mockdata.json
 ![img.png](img.png)
+
 
 ###  No alert for following Data:
 {
@@ -22,19 +25,24 @@ http://localhost:8082/swagger-ui/index.html (alert-service)
 "systolic": 128,
 "diastolic": 82,"capturedAt": "2025-08-01T12:20:00Z"
 }
+
  you can find log entry related to this  in alter-service log
 ![img_1.png](img_1.png)
+
 
 ### Implemented Validations 
 - Used @RestControllerAdvice(@see GlobalErrorController.java in vital-service project)
 - Provided support for Jakarta Bean Validation (e.g., @Valid, @NotNull) using Hibernate Validator 
   through dependency spring-boot-starter-validation
 
+Validation for required fields like patientId, readingId an types
 ![img_2.png](img_2.png)
 
+Validation for mismatched field for type (only allowed BP,HR &bSPO2)
 ![img_3.png](img_3.png)
 
-## added in memory database H2(for vital-service) along with ConcurrentHashMap 
+
+## Supported In Memory Database H2 (for vital-service) along with ConcurrentHashMap 
 patients vitals are persisted concurrent Hash as well as persisted in table called readings(@see schema.sql)
 in H2 database (for now in memory only but with little config change it can be persisted on file)
 -- following vitals come from the reading table
@@ -46,23 +54,9 @@ curl -X 'GET' \
 ![img_4.png](img_4.png)
 
 
+### Post results via curl or using swagger api 
+- for more data @see src/main/resources/mockdata.json
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-###  Post results via curl or using swagger api
 curl -X 'POST' \
 'http://localhost:8081/readings' \
 -H 'accept: /' \
@@ -75,6 +69,11 @@ curl -X 'POST' \
 "diastolic": 95,
 "capturedAt": "2025-08-01T12:00:00Z"
 }'
+
+### Retrieve alerts via curl or using swagger api
+curl "http://localhost:8082/alerts?patientId=p-001"
+
+
 
 
 
