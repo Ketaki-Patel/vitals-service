@@ -14,6 +14,9 @@
 
 
 ###  Alerts Generated using sample data from src/main/resources/mockdata.json
+- retrieve alterts via curl or use swagger api
+- curl "http://localhost:8082/alerts?patientId=p-001"
+
 ![img.png](img.png)
 
 
@@ -35,8 +38,8 @@
 - Provided support for Jakarta Bean Validation (e.g., @Valid, @NotNull) using Hibernate Validator 
   through dependency spring-boot-starter-validation
 - Following two images shows
-- 1. Validation for required fields like patientId, readingId an types
-- 2. Validation for mismatched field for type (only allowed BP,HR &bSPO2)
+- 1. Validation(@NotNull, @NotBlank etc) for required fields like patientId, readingId and type
+- 2. Validation for mismatched type using IllegalArgumentException (only allowed types are BP,HR &bSPO2)
 
 ![img_2.png](img_2.png)
 ![img_3.png](img_3.png)
@@ -69,8 +72,7 @@ curl -X 'POST' \
 "capturedAt": "2025-08-01T12:00:00Z"
 }'
 
-### Retrieve alerts via curl or using swagger api
-curl "http://localhost:8082/alerts?patientId=p-001"
+
 
 
 
