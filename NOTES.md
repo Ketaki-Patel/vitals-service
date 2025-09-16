@@ -39,7 +39,7 @@
   through dependency spring-boot-starter-validation
 - Following two images shows
 - 1. Validation(@NotNull, @NotBlank etc) for required fields like patientId, readingId and type
-- 2. Validation for mismatched type using IllegalArgumentException (only allowed types are BP,HR &bSPO2)
+- 2. Validation for mismatched type by throwing IllegalArgumentException and its Handler (types allowed are BP,HR &bSPO2)
 
 ![img_2.png](img_2.png)
 ![img_3.png](img_3.png)
