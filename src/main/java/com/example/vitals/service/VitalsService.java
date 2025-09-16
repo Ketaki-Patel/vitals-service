@@ -111,18 +111,20 @@ public class VitalsService {
     //following methods are extra methods which retrieves data from the h2 database.
     public Flux<Reading> getReadingsByPatientId(String patientId) {
         return readingRepository.findByPatientId(patientId)
-                .map(readingMapper::toDto);
+                .map(readingMapper::toDto)
+                .switchIfEmpty(Mono.error(new ReadingNotFoundException("Reading not found with ID", patientId)));
     }
 
     public Flux<Reading> getReadingsByType(String type) {
         return readingRepository.findByType(type)
-                .map(readingMapper::toDto);
+                .map(readingMapper::toDto)
+                .switchIfEmpty(Mono.error(new ReadingNotFoundException("Reading not found with type", type)));
     }
 
     public Mono<Reading> getReadingById(UUID readingId) {
         return readingRepository.findById(readingId)
                 .map(readingMapper::toDto)
-                .switchIfEmpty(Mono.error(new ReadingNotFoundException("Reading not found with ID: " + readingId)));
+                .switchIfEmpty(Mono.error(new ReadingNotFoundException(readingId)));
     }
 
     public Flux<Reading> getAllReadings() {

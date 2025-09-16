@@ -29,26 +29,26 @@ public class VitalsController {
                 .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().<Void>build()));
     }
 
-    // Get all readings
+    // Get all readings from h2 database
     @GetMapping
     public Flux<Reading> getAllReadings() {
         return vitalsService.getAllReadings();
     }
 
-    // Get reading by ID
+    // Get reading by ID from h2 database
     @GetMapping("/{readingId}")
     public Mono<ResponseEntity<Reading>> getReadingById(@PathVariable @NonNull UUID readingId) {
         return vitalsService.getReadingById(readingId)
                 .map(ResponseEntity::ok);
     }
 
-    // Get readings by patient ID
+    // Get readings by patient ID from h2 database
     @GetMapping("/patient/{patientId}")
     public Flux<Reading> getReadingsByPatientId(@PathVariable  String patientId) {
         return vitalsService.getReadingsByPatientId(patientId);
     }
 
-    // Get readings by type
+    // Get readings by type from h2 database
     @GetMapping("/type/{type}")
     public Flux<Reading> getReadingsByType(@PathVariable @NotBlank String type) {
         return vitalsService.getReadingsByType(type);

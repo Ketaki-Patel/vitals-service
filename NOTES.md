@@ -1,4 +1,5 @@
 ## 1. Notes
+
 - vitals-service validates readings by type:
   BP requires systolic and diastolic,
   HR requires hr,
@@ -8,7 +9,6 @@
 -  No authentication is implemented yet — kept simple for demo.
 -  Patient Vitals are stored in ** H2 Database ** along with Concurrent Hash
 -  For more info visit https://github.com/Ketaki-Patel/vitals-service/blob/main/README.md
-
 
 ### 2. Swagger UI (added swagger api for convenience)
 - http://localhost:8081/swagger-ui/index.html (vital-service)
