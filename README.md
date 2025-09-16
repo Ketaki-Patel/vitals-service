@@ -1,6 +1,7 @@
 # vitals-service
 This project uses Project Reactor for reactive, asynchronous, and non-blocking processing.
 Receives a patient vital reading, stores it in memory, and sends it asynchronously to the Alerts Service. 
+For more details refer https://github.com/Ketaki-Patel/vitals-service/blob/main/NOTES.md
 
 # Vitals → Alerts (Reactive) 
 
