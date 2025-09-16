@@ -9,7 +9,7 @@
 -  Patient Vitals are stored in ** H2 Database ** along with Concurrent Hash
 
 
-### 2. Swagger UI (I added swagger api for convenience)
+### 2. Swagger UI (added swagger api for convenience)
 - http://localhost:8081/swagger-ui/index.html (vital-service)
 - http://localhost:8082/swagger-ui/index.html (alert-service)
 
