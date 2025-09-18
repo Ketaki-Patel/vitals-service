@@ -80,13 +80,13 @@ Note: One clarification regarding my implementation of take home assignment pert
 
 - The purpose of using the H2 database was:
 
-- Future persistence: It allows easy conversion to a persistent storage solution with minimal configuration changes if a persistence layer is required. I did not         implement actual persistence to avoid creating a local filesystem dependency, which could complicate cloning.
+    - **Future persistence**: It allows easy conversion to a persistent storage solution with minimal configuration changes if a persistence layer is required. I did not         implement actual persistence to avoid creating a local filesystem dependency, which could complicate cloning.
 
-- Experimentation with R2DBC: I wanted to gain experience using R2DBC with a reactive database connection.
+    - **Experimentation with R2DBC**: I wanted to gain experience using R2DBC with a reactive database connection.
 
-- Service-specific usage: H2 is used only in Vitals-Service for now. The solution can be extended to Alert-Service if needed, so I did not implement it there initially.
+    - **Service-specific usage**: H2 is used only in Vitals-Service for now. The solution can be extended to Alert-Service if needed, so I did not implement it there             initially.
 
-- API-based data access: Since the H2 console (/h2-desktop) does not work directly with R2DBC (it requires a blocking JDBC connection which i wanted to avoid so i did    not support it), but I added a few GET APIs in Vital-Service to view table records without blocking the reactive flow, so just in case you see those additional get     api in code then you know 
+    - **API-based data access**: Since the H2 console (/h2-desktop) does not work directly with R2DBC (it requires a blocking JDBC connection which i wanted to avoid so i        did not support it), but I added a few GET APIs in Vital-Service to view table records without blocking the reactive flow, so just in case you see those                additional get api in code then you know 
 
 
 
